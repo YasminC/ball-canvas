@@ -1,0 +1,316 @@
+<html>
+<head>
+	<title>Yasmin's Ping Ball Game</title>
+</head>
+
+<body>
+
+<canvas id="myCanvas" width="700" height="400" style="border:1px solid #000000;"></canvas>
+<!--A BUTTON TO CONNECT SO GIVES AN OPTION<button onclick="controller.connect()">Count Fingers (Connect Controller)</button>-->
+<script src="http://js.leapmotion.com/0.2.0/leap.min.js"></script>
+
+<script>
+
+var widthCanvas = myCanvas.width; 
+var heightCanvas = myCanvas.height;
+var canvas=document.getElementById("myCanvas");
+var ctx=canvas.getContext("2d");
+var held = {};
+var frame;
+    
+    function leapToScene( leapPos ){
+
+      var iBox = frame.interactionBox;
+
+      var left = iBox.center[0] - iBox.size[0]/2;
+      var top = iBox.center[1] + iBox.size[1]/2;
+
+      var x = leapPos[0] - left;
+      var y = leapPos[1] - top;
+
+      x /= iBox.size[0];
+      y /= iBox.size[1];
+
+      x *= widthCanvas;
+      y *= heightCanvas;
+
+      return [ x , -y ];
+      console.log(leapPos);
+
+    }
+
+var controller = new Leap.Controller({enableGestures:true});
+
+    controller.on( 'frame' , function( data ){
+      
+      frame = data;
+
+      ctx.clearRect( 0 , 0 , widthCanvas , heightCanvas );
+
+      for( var i =  0; i < frame.gestures.length; i++){
+
+    var gesture  = frame.gestures[0];
+    //Per gesture code goes here
+
+  }
+
+    });
+
+
+
+var p1y = 0;
+var p1x = 20;
+var p1Height =100;
+var p2y = 0;
+var p2x = 630;
+var p2Height =100;
+var p1Width =25;
+
+var x = 350;
+var y = 200;
+
+var ballx = 350;
+var bally = 200;
+
+var velocityX = 5; // movement per frame
+var velocityY = 5; // movement per frame
+
+var p1score = 0;
+var p2score = 0;
+
+var keys = {
+    W:  87,
+    S:  83,
+    Up: 38,
+    Down: 40,
+};
+
+function reloadPage() {
+	location.reload();
+};
+
+document.body.onkeydown = function(e){
+  
+  if (e.keyCode == keys.W) {held.W = true;}
+  if (e.keyCode == keys.S) {held.S = true;}
+  if (e.keyCode == keys.Up) {held.Up = true;}
+  if (e.keyCode == keys.Down) {held.Down = true;}
+
+  if (e.keyCode == keys.W) {held.W = true;}
+  if (e.keyCode == keys.S) {held.S = true;}
+  if (e.keyCode == keys.Up) {held.Up = true;}
+  if (e.keyCode == keys.Down) {held.Down = true;}
+};
+
+document.body.onkeyup = function(e){
+  if (e.keyCode == keys.W) held.W = false;
+  if (e.keyCode == keys.S) held.S = false;
+  if (e.keyCode == keys.Up) held.Up = false;
+  if (e.keyCode == keys.Down) held.Down = false;
+};
+
+var img = new Image()
+img.src = "background.jpg"
+img.onload = function () {
+draw();
+animate();
+
+};
+
+//p1 score and loop game
+function p1scored() {
+resetball();
+p1score ++;
+if (p1score > 10) {
+	confirm("Player 1, you're a winner!");
+	var userAnswer = prompt("Would you like to play again?");
+
+if (userAnswer == "yes") {
+	reloadPage();
+}
+else {  
+	confirm("Do you not enjoy my game? :(");
+		window.location.href="http://www.youtube.com/watch?v=tjt-irRCZEs";
+}
+}
+};
+
+//p2 score and loop
+function p2scored() {
+resetball();
+p2score ++;
+if (p2score > 10) {
+	confirm("Player 2, you're a winner!");
+	var userAnswer = prompt("Would you like to play again?"); 
+
+if (userAnswer == "yes") {
+	reloadPage();
+}
+else {
+	confirm("Do you not enjoy my game? :(");
+		window.location.href="http://www.youtube.com/watch?v=tjt-irRCZEs";
+
+}
+}
+};
+
+function resetball() {
+    x = 350;
+	y = 200;
+
+    velocityY = Math.random()*5; 
+    if (Math.random() > .5) {
+	    velocityY = -velocityY
+    } 
+};	
+
+//function isCollide(a, b) {
+   
+function animate(){
+
+	reqAnimFrame = window.mozRequestAnimationFrame    ||
+                window.webkitRequestAnimationFrame ||
+                window.msRequestAnimationFrame     ||
+                window.oRequestAnimationFrame
+                ;
+
+    reqAnimFrame(animate);
+
+//keys
+if (held.W) p1y = p1y - 5;
+if (held.S) p1y = p1y + 5;
+if (held.Up) p2y = p2y - 5;
+if (held.Down) p2y = p2y + 5; 
+
+if (p1y < 0) 
+	p1y = 0;
+if (p1y + p1Height > canvas.height) 
+	p1y = canvas.height - p1Height;
+if (p2y < 0) 
+	p2y = 0;
+if (p2y + p2Height > canvas.height) 
+	p2y = canvas.height - p2Height;
+
+
+//check sides
+if (bally > 400) { velocityY = -velocityY; } 
+if (bally < 0) { velocityY = -velocityY; }
+
+// apply game logic
+x += velocityX;
+y += velocityY;
+    
+//player scores
+if (ballx > 700) p1scored();
+if (ballx < 0) p2scored ();
+
+// update player
+ballx = x;
+bally = y;
+
+
+//collision detection
+if (ballx >= p2x && velocityX > 0) {
+	if(bally > p2y && bally < p2y + p2Height) {
+	 velocityX = -velocityX; 
+	 console.log(velocityY);	
+	 velocityY += ((p2y - bally)-p2Height) *.01;
+	 console.log(velocityY);	
+	}
+};
+if (ballx <= p1x + p1Width && velocityX < 0) {
+	if(bally > p1y && bally < p1y + p1Height) {
+	 velocityX = -velocityX; 
+	 console.log(velocityY);	
+	 velocityY += ((p1y - bally)-p1Height) *.01;
+	 console.log(velocityY);
+	}
+};
+
+
+draw();
+
+}
+
+
+
+function draw(){
+	//clear and redraw canvas
+	ctx.clearRect(0, 0, 700, 400)
+	ctx.drawImage(img, 0, 0);
+
+	//player1
+	//var p1 = {
+	ctx.fillStyle="#FF0000",
+	ctx.fillRect(p1x, p1y, 25, p1Height),
+
+	ctx.strokeStyle="#CEF6CE",
+	ctx.lineWidth=2,
+	ctx.strokeRect(p1x, p1y, 25, p1Height),
+//};
+	//player 2
+	//var p2 = {
+	ctx.fillStyle="#2E64FE",
+	ctx.fillRect(p2x, p2y, 25, p2Height),
+
+	ctx.strokeStyle="#CEF6CE",
+	ctx.lineWidth=2,
+	ctx.strokeRect(p2x, p2y, 25, p2Height),
+//};
+	//ball
+	//var ball = {
+	ctx.beginPath(),
+	ctx.arc(ballx, bally,15,0,2*Math.PI),
+	ctx.fillStyle="#FFFF00",
+	ctx.lineWidth=2,
+	ctx.strokeStyle="#CEF6CE",
+	ctx.lineWidth=2,
+	ctx.fill(), 
+	ctx.stroke(),
+//};
+
+    //text box
+	ctx.beginPath();
+	ctx.moveTo(250,0);
+	ctx.lineTo(250,50);
+	ctx.lineTo(350, 50);
+	ctx.lineTo(350, 0);
+	ctx.moveTo(350, 50);
+	ctx.lineTo(450, 50);
+	ctx.lineTo(450, 0);
+	ctx.strokeStyle="#9FF781";
+	ctx.stroke();
+	ctx.closePath();
+
+	//player1 text
+	ctx.font="15.5px Arial";
+	ctx.fillStyle="#FF0000";
+	ctx.strokeStyle="#9FF781";
+	ctx.lineWidth=0.2;
+	ctx.fillText("Player 1",252,15);
+	ctx.strokeText("Player 1",252,15);
+
+	//player1 score
+	ctx.font="31px Arial";
+	ctx.fillStyle="#FF0000";
+	ctx.fillText (p1score, 294, 43);
+    
+    //player2 text
+	ctx.font="15.5px Arial";
+	ctx.fillStyle="#2E64FE";
+	ctx.strokeStyle="#9FF781";
+	ctx.lineWidth=0.2;
+	ctx.fillText("Player 2",389,15);
+	ctx.strokeText("Player 2",389,15);
+
+	//player2 score
+	ctx.font="31px Arial";
+	ctx.fillStyle="#2E64FE";
+	ctx.fillText (p2score, 394 , 43);
+};
+controller.connect();
+</script>
+
+
+</body>
+</html>
