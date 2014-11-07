@@ -1,6 +1,6 @@
 <html>
 <head>
-	<title>Yasmin's Ping Ball Game</title>
+	<title>Yasmin's Ping Pong Javascript Ball Game</title>
 </head>
 
 <body>
@@ -51,6 +51,11 @@ document.body.onkeydown = function(e){
   if (e.keyCode == keys.S) {held.S = true;}
   if (e.keyCode == keys.Up) {held.Up = true;}
   if (e.keyCode == keys.Down) {held.Down = true;}
+
+  if (e.keyCode == keys.W) {held.W = true;}
+  if (e.keyCode == keys.S) {held.S = true;}
+  if (e.keyCode == keys.Up) {held.Up = true;}
+  if (e.keyCode == keys.Down) {held.Down = true;}
 };
 
 document.body.onkeyup = function(e){
@@ -64,7 +69,6 @@ var img = new Image()
 img.src = "background.jpg"
 img.onload = function () {
 draw();
-animate();
 
 };
 
@@ -74,15 +78,7 @@ resetball();
 p1score ++;
 if (p1score > 10) {
 	confirm("Player 1, you're a winner!");
-	var userAnswer = prompt("Would you like to play again?");
-
-if (userAnswer == "yes") {
 	reloadPage();
-}
-else {  
-	confirm("Do you not enjoy my game? :(");
-		window.location.href="http://www.youtube.com/watch?v=tjt-irRCZEs";
-}
 }
 };
 
@@ -92,16 +88,7 @@ resetball();
 p2score ++;
 if (p2score > 10) {
 	confirm("Player 2, you're a winner!");
-	var userAnswer = prompt("Would you like to play again?"); 
-
-if (userAnswer == "yes") {
 	reloadPage();
-}
-else {
-	confirm("Do you not enjoy my game? :(");
-		window.location.href="http://www.youtube.com/watch?v=tjt-irRCZEs";
-
-}
 }
 };
 
@@ -257,6 +244,24 @@ function draw(){
 	ctx.fillStyle="#2E64FE";
 	ctx.fillText (p2score, 394 , 43);
 };
+/*
+       * define the runAnimation boolean as an obect
+       * so that it can be modified by reference
+       */
+      var runAnimation = {
+        value: false
+      };
+
+      // add click listener to canvas
+      document.getElementById('myCanvas').addEventListener('click', function() {
+        // flip flag
+        runAnimation.value = !runAnimation.value;
+
+        if(runAnimation.value) {
+          animate();
+        }
+      });
+      draw();
 </script>
 
 </body>
